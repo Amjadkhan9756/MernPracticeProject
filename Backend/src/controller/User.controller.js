@@ -3,7 +3,7 @@ import Profile from "../modules/profile.module.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
- export const userRegister = async (req, res) => {
+export const userRegister = async (req, res) => {
     try {
         const { name, userName, email, password } = req.body;
         if (!name || !userName || !email || !password) {
@@ -94,10 +94,34 @@ export const userLogin = async (req, res) => {
 
 //upload profilePicture
 
-export const uploadProfilePicture = async (req,res)=>{
-    try{
+export const uploadProfilePicture = async (req, res) => {
+    console.log("body",
+        req.body
+    );
+    console.log("File", req.file);
+    try {
+        const {token} = req.body;
 
-    } catch(error){
+        if(!token){
+            return res.status(400).json({message:"no token provided "})
+        }
+
+        const user = await User.findOne({ token });
+
+        if(!user){
+            return res.status(404).json({message:"User not found"})
+        }
+        if(!req.file){
+            return res.status(400).json({message:"no file uploaded "})
+        }
+
+        console.log(req.file.filename);
+        await user.profilePicture = req.file.filename;
+        await user.save();
+
+        return res.json({message:"Profile picture uploaded successfully"})
+
+    } catch (error) {
         console.error(error);
         return res.status(500).json({ message: "Internal server error" });
     }
