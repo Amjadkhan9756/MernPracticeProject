@@ -127,9 +127,3 @@ export const uploadProfilePicture = async (req, res) => {
     }
 }
 
-// export default userLogin;
-
-// export default  UserController={
-//     userRegister,
-//     userLogin
-// }

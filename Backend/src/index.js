@@ -8,14 +8,14 @@ connectDB();
 app.use(express.json());
 app.use("/api/auth", authRouter);
 
-app.get("/",(req,res)=>{
+app.get("/", (req, res) => {
     res.send("Hello this the root page");
 })
 
 
 
 
-const PORT=3000;
-app.listen(PORT,()=>{
+const PORT = 3000;
+app.listen(PORT, () => {
     console.log("server is connected successfully")
 })
