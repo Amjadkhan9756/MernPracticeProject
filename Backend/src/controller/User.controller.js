@@ -100,26 +100,26 @@ export const uploadProfilePicture = async (req, res) => {
     );
     console.log("File", req.file);
     try {
-        const {token} = req.body;
+        const { token } = req.body;
 
-        if(!token){
-            return res.status(400).json({message:"no token provided "})
+        if (!token) {
+            return res.status(400).json({ message: "no token provided " })
         }
 
         const user = await User.findOne({ token });
 
-        if(!user){
-            return res.status(404).json({message:"User not found"})
+        if (!user) {
+            return res.status(404).json({ message: "User not found" })
         }
-        if(!req.file){
-            return res.status(400).json({message:"no file uploaded "})
+        if (!req.file) {
+            return res.status(400).json({ message: "no file uploaded " })
         }
 
         console.log(req.file.filename);
         await user.profilePicture = req.file.filename;
         await user.save();
 
-        return res.json({message:"Profile picture uploaded successfully"})
+        return res.json({ message: "Profile picture uploaded successfully" })
 
     } catch (error) {
         console.error(error);
@@ -128,10 +128,28 @@ export const uploadProfilePicture = async (req, res) => {
 }
 
 ///upadte userprfile 
-const updateuserprofile = async (req,res)=>{
-    try{
+const updateuserprofile = async (req, res) => {
+    try {
+        const { token, ...newuser } = req.body;
+        const user = await User.findOne({ token });
+        if (!user) {
+            return res.status(404).json({ message: "user not found " })
+        }
+        const { username, email } = newuser;
 
-    } catch(error){
+        const existuser = await User.findOne({ $or: [{ email }] });
+
+        if (existuser) {
+            if (existuser || String(existuser._id != user._id)) {
+                return res.status(400).json({ message: "user already exist" })
+            }
+        }
+        Object.assign(user, newuser);
+        await user.save();
+
+        return res.json({ message: "User profile updated successfully" });  
+
+    } catch (error) {
         console.error(error);
         return res.status(500).json({ message: "Internal server error" });
     }
