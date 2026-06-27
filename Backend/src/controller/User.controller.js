@@ -156,36 +156,61 @@ export const updateuserprofile = async (req, res) => {
 }
 
 
+import Profile from "../models/Profile.js";
+import jwt from "jsonwebtoken";
+import { getVerifiedUserIds } from "../utils/verifiedUsers.js";
 
-
-export const getuserupdateprofile = async (req, res) => {
+export const getUserProfile = async (req, res) => {
     try {
+        // Extract token from request body
         const { token } = req.body;
         console.log("token", token);
-        if (!user) {
-            return res.status(404).json({ message: "user not found !" });
 
+        // Verify and decode the token to get user data
+        let user;
+        try {
+            user = jwt.verify(token, process.env.JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({ message: "Invalid or expired token!" });
         }
-        const userProfle = await Profile.findOne({ userId: user._id }).populate(
+
+        // Check if user exists after decoding
+        if (!user) {
+            return res.status(404).json({ message: "User not found!" });
+        }
+
+        // Find the profile in DB and populate user fields
+        const userProfile = await Profile.findOne({ userId: user._id }).populate(
             "userId",
             "name email username profilePicture"
-        )
+        );
 
+        // If no profile found, return 404
         if (!userProfile) {
-            return res.status(404).json({ message: "User profile not found !" });
+            return res.status(404).json({ message: "User profile not found!" });
         }
 
-        const profleObje = userProfile.toObject();
+        // Convert Mongoose document to plain JS object
+        const profileObj = userProfile.toObject();
 
-        profileObj.postwork = profileObj.postwork || profileObj.pastWork || [];
+        // Ensure pastWork field always exists (fallback to empty array)
+        profileObj.pastWork = profileObj.pastWork || profileObj.postwork || [];
+
+        // Get all verified user IDs
         const verifiedIds = await getVerifiedUserIds();
-        if (profileObj.userId) profileObj.userId.verified = verifiedIds.has(profileObj.userId._id.toString());
+
+        // Dynamically add verified flag to user object
+        if (profileObj.userId) {
+            profileObj.userId.verified = verifiedIds.has(
+                profileObj.userId._id.toString()
+            );
+        }
+
+        // Send success response with profile data
         return res.status(200).json({ userProfile: profileObj });
-
-
 
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: "Internal server error" });
     }
-}
+};
