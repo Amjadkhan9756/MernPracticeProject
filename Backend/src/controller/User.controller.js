@@ -147,7 +147,7 @@ export const updateuserprofile = async (req, res) => {
         Object.assign(user, newuser);
         await user.save();
 
-        return res.json({ message: "User profile updated successfully" });  
+        return res.json({ message: "User profile updated successfully" });
 
     } catch (error) {
         console.error(error);
@@ -157,3 +157,35 @@ export const updateuserprofile = async (req, res) => {
 
 
 
+
+export const getuserupdateprofile = async (req, res) => {
+    try {
+        const { token } = req.body;
+        console.log("token", token);
+        if (!user) {
+            return res.status(404).json({ message: "user not found !" });
+
+        }
+        const userProfle = await Profile.findOne({ userId: user._id }).populate(
+            "userId",
+            "name email username profilePicture"
+        )
+
+        if (!userProfile) {
+            return res.status(404).json({ message: "User profile not found !" });
+        }
+
+        const profleObje = userProfile.toObject();
+
+        profileObj.postwork = profileObj.postwork || profileObj.pastWork || [];
+        const verifiedIds = await getVerifiedUserIds();
+        if (profileObj.userId) profileObj.userId.verified = verifiedIds.has(profileObj.userId._id.toString());
+        return res.status(200).json({ userProfile: profileObj });
+
+
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+}
