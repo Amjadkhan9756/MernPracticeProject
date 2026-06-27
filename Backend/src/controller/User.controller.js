@@ -214,3 +214,29 @@ export const getUserProfile = async (req, res) => {
         return res.status(500).json({ message: "Internal server error" });
     }
 };
+
+
+export const updateProfileData = async (req, res) => {
+    try {
+        const { token, ...newProfileData } = req.body;
+
+        const userProfile = await User.findOne({ token });
+
+        if (!userProfile) {
+            return res.status(404).json({ message: "user not found " });
+
+        }
+
+        if (!ProfileData) return res.status(404).json({ message: "profile not Detect" });
+        if (newProfileData.postwork !== undefined) ProfileData.pastWork = newProfileData.postwork;
+        if (newProfileData.pastWork !== undefined) ProfileData.pastWork = newProfileData.pastWork;
+        if (newProfileData.bio !== undefined) ProfileData.bio = newProfileData.bio;
+        if (newProfileData.currentPost !== undefined) ProfileData.currentPost = newProfileData.currentPost;
+        if (newProfileData.education !== undefined) ProfileData.education = newProfileData.education;
+        await ProfileData.save();
+        return res.status(200).json({ message: "Profile update" })
+    } catch (error) {
+        return res.status(500).json({ message: err.message })
+
+    }
+}
