@@ -128,7 +128,7 @@ export const uploadProfilePicture = async (req, res) => {
 }
 
 ///upadte userprfile 
-const updateuserprofile = async (req, res) => {
+export const updateuserprofile = async (req, res) => {
     try {
         const { token, ...newuser } = req.body;
         const user = await User.findOne({ token });
@@ -154,3 +154,6 @@ const updateuserprofile = async (req, res) => {
         return res.status(500).json({ message: "Internal server error" });
     }
 }
+
+
+
