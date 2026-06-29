@@ -18,7 +18,6 @@ const storage = multer.diskStorage({
 const upload = multer({ storage })   
 
 
-
-router.post("/post",upload.single("videos"),createPost)
+router.post("/Post ",upload.single("videos"),createPost);
 
 export default router;
