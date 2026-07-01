@@ -42,5 +42,6 @@ export const createPost = async (req,res)=>{
 
 
 const getAllPost = async (req,res) =>{
+    const posts = await Post.find().populate()
    
 }
